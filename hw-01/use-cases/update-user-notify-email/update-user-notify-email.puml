@@ -1,0 +1,18 @@
+@startuml
+
+queue "Kafka" as kafka
+participant "email-notify" as notify
+database "Postgres" as pg
+
+kafka -> notify: new/update user
+notify -> pg: find user by id
+pg --> notify
+alt #lightgreen User exists
+    notify -> pg: update user email
+    pg --> notify
+else #lightgrey User does not exist
+    notify -> pg: save new user email
+    pg --> notify
+end
+
+@enduml

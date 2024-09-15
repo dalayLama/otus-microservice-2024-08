@@ -1,0 +1,36 @@
+@startuml
+
+actor "Administrator" as admin
+participant "gateway" as gw
+boundary "Keycloak" as kk
+participant "books" as books
+database "Postgres" as pg_books
+boundary "Minio" as minio
+queue "Kafka" as kafka
+
+admin -> gw: POST /api/v1/books/{id}/files
+gw -> kk: verify jwt
+kk --> gw
+alt #lightgreen jwt is valid
+    gw -> books:  POST /api/v1/books/{id}/files
+    books -> books: check actor role
+    alt #lightgreen actor is "Administrator"
+        books -> minio: save new file
+        minio --> books: link
+        books -> pg_books: save link to book_id
+        pg_books --> books
+        par #lightblue
+            books -> kafka: new book format event
+        end
+    else #coral actor is not "Administrator"
+        books --> gw: HttpStatus 403
+        gw --> admin: HttpStatus 403
+    end
+
+else #coral jwt is absent
+    gw --> admin: HttpStatus 401
+else #coral jwt is not valid
+    gw --> admin: HttpStatus 403
+end
+
+@enduml

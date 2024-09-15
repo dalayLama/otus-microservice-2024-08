@@ -1,0 +1,24 @@
+@startuml
+
+actor "User" as user
+participant "gateway" as gw
+boundary "Keycloak" as kk
+participant "catalog" as catalog
+database "Postgres" as pg
+
+user -> gw: GET /api/v1/books?filter...
+gw -> kk: verify jwt
+kk --> gw
+alt #lightgreen jwt is valid
+    gw -> catalog: GET /api/v1/books?filter...
+    catalog -> pg: find books by filter
+    pg --> catalog
+    catalog --> gw: book list
+    gw --> user: book list
+else #coral jwt is absent
+    gw --> user: HttpStatus 401
+else #coral jwt is not valid
+    gw --> user: HttpStatus 403
+end
+
+@enduml

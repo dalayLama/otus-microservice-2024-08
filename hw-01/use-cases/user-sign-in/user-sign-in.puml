@@ -1,0 +1,20 @@
+@startuml
+
+actor "User" as user
+participant "gateway" as gw
+participant "auth-service" as auth
+boundary "Keycloak" as kk
+
+user -> gw: POST /api/v1/sign-in
+gw -> auth: /api/v1/sign-in
+auth -> kk: auth by login/password
+kk --> auth
+alt #lightgreen Credentials are valid
+    auth --> gw: jwt
+    gw --> user: jwt
+else #coral [Credentials] are valid
+    auth --> gw: HttpStatus 401
+    gw --> user: HttpStatus 401
+end
+
+@enduml

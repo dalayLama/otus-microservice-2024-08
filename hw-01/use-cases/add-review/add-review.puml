@@ -1,0 +1,24 @@
+@startuml
+
+actor "User" as user
+participant "gateway" as gw
+boundary "Keycloak" as kk
+participant "review" as review
+database "Mongo" as mongo
+
+user -> gw: POST /api/v1/books/{bookId}/reviews
+gw -> kk: verify jwt
+kk --> gw
+alt #lightgreen jwt is valid
+    gw -> review: POST /api/v1/books/{bookId}/reviews
+    review -> mongo: save review data
+    mongo --> review
+    review --> gw: HttpStatus 201
+    gw --> user: HttpStatus 201
+else #coral jwt is absent
+    gw --> user: HttpStatus 401
+else #coral jwt is not valid
+    gw --> user: HttpStatus 403
+end
+
+@enduml

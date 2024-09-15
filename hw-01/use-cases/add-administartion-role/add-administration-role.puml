@@ -1,0 +1,29 @@
+@startuml
+
+actor "Administrator" as admin
+participant "gateway" as gw
+participant "user-service" as us
+boundary "Keycloak" as kk
+
+admin -> gw: PUT /api/v1/users/{id}/roles
+gw -> kk: verify jwt
+kk --> gw
+alt #lightgreen jwt is valid
+    gw -> us: PUT /api/v1/users/{id}/roles
+    us -> us: check actor role
+    alt #lightgreen Actor is "Administrator"
+        us -> kk: update user role [role]
+        kk --> us: HttpStatus 200
+        us --> gw: HttpStatus 200
+        gw --> admin: HttpStatus 200
+    else #coral Actor is not "Administrator"
+        us --> gw: HttpStatus 403
+        gw --> admin: HttpStatus 403
+    end
+else #coral jwt is absent
+    gw --> admin: HttpStatus 401
+else #coral jwt is not valid
+    gw --> admin: HttpStatus 403
+end
+
+@enduml
