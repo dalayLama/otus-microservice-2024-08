@@ -1,0 +1,24 @@
+@startuml
+
+actor "User" as user
+participant "gateway" as gw
+boundary "Keycloak" as kk
+participant "subscription" as sub
+database "Mongo" as mongo
+
+user -> gw: GET /api/v1/subscriptions
+gw -> kk: verify jwt
+kk --> gw
+alt #lightgreen jwt is valid
+    gw -> sub: GET /api/v1/subscriptions
+    sub -> mongo: get user subscription config by user id
+    mongo --> sub: subscription config
+    sub --> gw: subscription config
+    gw --> user: subscription config
+else #coral jwt is absent
+    gw --> user: HttpStatus 401
+else #coral jwt is not valid
+    gw --> user: HttpStatus 403
+end
+
+@enduml

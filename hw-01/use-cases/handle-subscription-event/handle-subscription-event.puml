@@ -1,0 +1,12 @@
+@startuml
+
+queue "Kafka" as kafka
+participant "subscription" as sub
+database "Mongo" as mongo
+
+kafka -> sub: event [NEW BOOK, NEW FILE]
+sub -> mongo: find users with suitable config [by author, tags, genre, etc...]
+mongo --> sub: users
+sub -> kafka: tasks send emails
+
+@enduml

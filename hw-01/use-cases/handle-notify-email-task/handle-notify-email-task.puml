@@ -1,0 +1,15 @@
+@startuml
+
+queue "Kafka" as kafka
+participant "email-notify" as notify
+database "Postgres" as pg
+boundary "SMPT service" as smpt
+
+kafka -> notify: task notify user
+notify -> pg: find users emails
+pg --> notify: emails
+par #lightblue for each email
+    notify -> smpt: send email
+end
+
+@enduml

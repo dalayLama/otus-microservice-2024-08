@@ -1,0 +1,42 @@
+@startuml
+
+actor "Administrator" as admin
+participant "gateway" as gw
+boundary "Keycloak" as kk
+participant "catalog" as catalog
+database "Postgres" as pg
+queue "Kafka" as kafka
+
+admin -> gw: POST /api/v1/books
+gw -> kk: verify jwd
+kk --> gw
+alt #lightgreen jwt is valid
+    gw -> catalog: POST /api/v1/books
+    catalog -> catalog: check actor role
+    alt #lightgreen actor is "Administrator"
+        catalog -> pg: check book exists
+        pg --> catalog:
+        alt #lightgreen book does not exist
+            catalog -> pg: save new book
+            pg --> catalog
+            par #lightblue
+                catalog -> kafka: new book event
+            end
+            catalog --> gw: HttpStatus 201
+            gw --> admin: HttpStatus 201
+        else #coral author exists
+            catalog --> gw: HttpStatus 409
+            gw --> admin: HttpStatus 409
+        end
+    else #coral actor is not "Administrator"
+        catalog --> gw: HttpStatus 403
+        gw --> admin: HttpStatus 403
+    end
+
+else #coral jwt is absent
+    gw --> admin: HttpStatus 401
+else #coral jwt is not valid
+    gw --> admin: HttpStatus 403
+end
+
+@enduml

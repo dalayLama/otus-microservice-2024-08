@@ -1,0 +1,29 @@
+@startuml
+
+actor "User" as user
+participant "gateway" as gw
+participant "user-service" as us
+boundary "Keycloak" as kk
+database "Mongo" as user_db
+queue "Kafka" as kafka
+
+user -> gw: POST /api/v1/sign-up
+gw -> us: /api/v1/users
+us -> kk: check user existence
+kk --> us
+alt #lightgreen User doesn't exist
+    us -> kk: save user data
+    kk --> us
+    us -> user_db: save user data
+    par #lightblue
+        us -> kafka: new user event
+    end
+    user_db --> us
+    us --> gw: HttpStatus 201
+    gw --> user: HttpStatus 201
+else #coral User exists
+     us --> gw: HttpStatus 409
+     gw --> user: HttpStatus 409
+end
+
+@enduml

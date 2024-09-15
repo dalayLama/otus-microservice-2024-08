@@ -1,0 +1,34 @@
+@startuml
+
+actor "User" as user
+participant "gateway" as gw
+boundary "Keycloak" as kk
+participant "catalog" as catalog
+database "Postgres Catalog" as pg_cat
+participant "books" as books
+participant "Postgres Books" as pg_book
+
+user -> gw: GET /api/v1/books/{id}
+gw -> kk: verify jwt
+kk --> gw
+alt #lightgreen jwt is valid
+    gw -> catalog: GET /api/v1/books/{id}
+    catalog -> pg_cat: get book by id
+    pg_cat --> catalog
+    alt #lightgreen book exists
+        catalog -> books: GET /api/v1/books/{id}/files
+        books --> catalog: file list
+        catalog -> catalog: aggregate
+        catalog --> gw: book details
+        gw --> user: book details
+    else #coral book does not exist
+        catalog --> gw: HttpStatus 404
+        gw --> user: HttpStatus 404
+    end
+else #coral jwt is absent
+    gw --> user: HttpStatus 401
+else #coral jwt is not valid
+    gw --> user: HttpStatus 403
+end
+
+@enduml
