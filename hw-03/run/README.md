@@ -17,7 +17,7 @@
 
 ### Тестирование
 
-Для тестирования есть [коллекция из postman](Otus.postman_collection.json), которая содержит 2 request-а:
+Для тестирования есть [коллекция из postman](Otus.postman_collection.json), которая содержит 4 request-а:
 - /health
 - /otusapp/artur/health
 - /otusapp/anyname/
