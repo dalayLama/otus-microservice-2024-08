@@ -48,6 +48,49 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "/otusapp/anyname/",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://arch.homework/otusapp/anyname/",
+							"protocol": "http",
+							"host": [
+								"arch",
+								"homework"
+							],
+							"path": [
+								"otusapp",
+								"anyname",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/otusapp/anyname/test/test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://arch.homework/otusapp/anyname/test/test",
+							"protocol": "http",
+							"host": [
+								"arch",
+								"homework"
+							],
+							"path": [
+								"otusapp",
+								"anyname",
+								"test",
+								"test"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}

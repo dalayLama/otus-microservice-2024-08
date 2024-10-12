@@ -19,9 +19,11 @@
 
 Для тестирования есть [коллекция из postman](Otus.postman_collection.json), которая содержит 2 request-а:
 - /health
-- /health/{name}/(*)
+- /otusapp/artur/health
+- /otusapp/anyname/
+- /otusapp/anyname/test/test
 
-Оба url-а возвращают ответ **{"status": "OK"}**, второй url был сделан для задания со свездойчкой
+Все url-ы возвращают ответ **{"status": "OK"}**, второй url был сделан для задания со свездойчкой
 
 Для успешного запуска данной коллекции чере newman необходимо выполнить команду(в host должен быть прописан arch.homework):
 
