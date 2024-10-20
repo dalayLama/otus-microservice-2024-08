@@ -12,8 +12,8 @@ gw -> kk: verify jwt
 kk --> gw
 alt #lightgreen jwt is valid
     gw -> books: GET /api/v1/books/{bookId}/files/{fileId}
-    books -> pg_books: get file data by id
-    pg_books --> books: file data
+    books -> pg_books: get file link by id
+    pg_books --> books: file link
     alt #lightgreen file data exists
         books -> minio: get file by link
         minio --> books: file

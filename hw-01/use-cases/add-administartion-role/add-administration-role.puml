@@ -10,9 +10,9 @@ gw -> kk: verify jwt
 kk --> gw
 alt #lightgreen jwt is valid
     gw -> us: PUT /api/v1/users/{id}/roles
-    us -> us: check actor role
+    us -> us: check jwt role
     alt #lightgreen Actor is "Administrator"
-        us -> kk: update user role [role]
+        us -> kk: update user role
         kk --> us: HttpStatus 200
         us --> gw: HttpStatus 200
         gw --> admin: HttpStatus 200

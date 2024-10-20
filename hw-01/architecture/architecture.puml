@@ -1,44 +1,46 @@
 @startuml component
 
 [gateway] as gw  #LightGray
-[books] as books #LightGray
-[catalog] as catalog #LightGray
 [user-service] as user #LightGray
-[auth-service] as auth #LightGray
+[catalog] as catalog #LightGray
+[books] as books #LightGray
 [review] as review #LightGray
-[subscription] as sub #LightGray
 [email-notify] as e_notify #LightGray
+[subscription] as sub #LightGray
 
 database "Postgres" as pg_books #LightCoral
 boundary "Minio" as minio #LightCoral
 database "Postgres" as pg_catalog #LightCoral
-database "Mongo" as mg_user #LightCoral
+database "Postgres" as pg_user #LightCoral
 boundary "Keycloak" as kk #LightCoral
 database "Mongo" as mg_review #LightCoral
+database "Mongo" as mg_sub #LightCoral
+database "Postgres" as pg_email #LightCoral
 queue "Kafka" as kafka #LightCoral
 
-gw --> books
-gw --> catalog
-gw --> user
-gw --> auth
-gw --> review
-gw --> sub
+gw -down--> catalog
+gw -down--> books
+gw -down--> user
+gw -down--> review
+gw -down--> sub
 
-catalog -left--> books
-catalog --> pg_catalog
-catalog --> kafka
-books --> pg_books
-books --> minio
-books --> kafka
-user --> mg_user
-user --> kk
-user --> kafka
-auth --> kk
-review --> mg_review
 
-sub --> kafka
-kafka --> sub
-kafka --> e_notify
+user -down-> kk
+user -down--> pg_user
+user -down--> kafka
+catalog -down--> kafka
+catalog -right-> books
+catalog -down--> pg_catalog
+books -down--> kafka
+books -down--> pg_books
+books -down--> minio
+review -down--> mg_review
+
+sub -up--> kafka
+sub -right->mg_sub
+kafka -down--> sub
+kafka -down--> e_notify
+e_notify -left--> pg_email
 
 
 @enduml

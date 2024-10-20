@@ -2,18 +2,18 @@
 
 actor "User" as user
 participant "gateway" as gw
-participant "auth-service" as auth
+participant "user-service" as us
 boundary "Keycloak" as kk
 
 user -> gw: POST /api/v1/sign-in
-gw -> auth: /api/v1/sign-in
-auth -> kk: auth by login/password
-kk --> auth
+gw -> us: /api/v1/sign-in
+us -> kk: us by login/password
+kk --> us
 alt #lightgreen Credentials are valid
-    auth --> gw: jwt
+    us --> gw: jwt
     gw --> user: jwt
 else #coral [Credentials] are valid
-    auth --> gw: HttpStatus 401
+    us --> gw: HttpStatus 401
     gw --> user: HttpStatus 401
 end
 
