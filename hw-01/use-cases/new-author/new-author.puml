@@ -11,7 +11,7 @@ gw -> kk: verify jwd
 kk --> gw
 alt #lightgreen jwt is valid
     gw -> catalog: POST /api/v1/authors
-    catalog -> catalog: check actor role
+    catalog -> catalog: check jwt role
     alt #lightgreen actor is "Administrator"
         catalog -> pg: check author existence
         pg --> catalog:

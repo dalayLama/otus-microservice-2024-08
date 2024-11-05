@@ -13,7 +13,7 @@ gw -> kk: verify jwt
 kk --> gw
 alt #lightgreen jwt is valid
     gw -> books:  POST /api/v1/books/{id}/files
-    books -> books: check actor role
+    books -> books: check jwt role
     alt #lightgreen actor is "Administrator"
         books -> minio: save new file
         minio --> books: link

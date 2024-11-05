@@ -6,7 +6,7 @@ boundary "Keycloak" as kk
 participant "catalog" as catalog
 database "Postgres Catalog" as pg_cat
 participant "books" as books
-participant "Postgres Books" as pg_book
+database "Postgres Books" as pg_book
 
 user -> gw: GET /api/v1/books/{id}
 gw -> kk: verify jwt
@@ -17,6 +17,8 @@ alt #lightgreen jwt is valid
     pg_cat --> catalog
     alt #lightgreen book exists
         catalog -> books: GET /api/v1/books/{id}/files
+        books -> pg_book: find files by bookId
+        pg_book --> books: file list
         books --> catalog: file list
         catalog -> catalog: aggregate
         catalog --> gw: book details
