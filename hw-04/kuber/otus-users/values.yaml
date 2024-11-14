@@ -1,0 +1,53 @@
+postgresql:
+  auth:
+    username: appUser
+    database: otus
+    existingSecret: postgres-auth
+  service:
+    port: 5432
+  primary:
+    persistence:
+      enabled: false
+  schema: public
+
+replicaCount: 1
+
+image:
+  repository: jimbeam777/otus-users
+  pullPolicy: IfNotPresent
+  tag: "0.0.1"
+
+migration:
+  image:
+    repository: jimbeam777/otus-users-migration
+    pullPolicy: IfNotPresent
+    tag: "0.0.1"
+
+nameOverride: ""
+fullnameOverride: ""
+
+podLabels: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations: {}
+  hosts:
+    - host: arch.homework
+      paths:
+        - path: /
+          pathType: Prefix
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
