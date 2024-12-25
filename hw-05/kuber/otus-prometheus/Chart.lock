@@ -1,0 +1,12 @@
+dependencies:
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.3.4
+- name: prometheus
+  repository: https://charts.bitnami.com/bitnami
+  version: 1.4.0
+- name: grafana
+  repository: https://charts.bitnami.com/bitnami
+  version: 11.4.2
+digest: sha256:5f9a8b97abfbfe73a4740fdd0c3ed260daabec01f98b77d9c6c7470a1c90501f
+generated: "2024-12-24T19:30:08.502307051Z"

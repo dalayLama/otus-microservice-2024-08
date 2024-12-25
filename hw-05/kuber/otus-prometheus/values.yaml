@@ -1,0 +1,138 @@
+grafana:
+  admin:
+    user: "admin"
+    password: "admin"
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+  persistence:
+    enabled: false
+  datasources:
+    secretDefinition:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          url: http://otus-app-prometheus-server.default.svc.cluster.local:9090
+          isDefault: true
+
+prometheus:
+  commonAnnotations:
+  server:
+    scrapeInterval: 5s
+    service:
+      type: LoadBalancer
+      ports:
+        http: 9090
+    extraScrapeConfigs:
+      - job_name: 'external-controller'
+        metrics_path: /metrics
+        static_configs:
+          - targets:
+              - 'nginx-ingress-nginx-controller-metrics.ing-nginx.svc.cluster.local:10254'
+      - job_name: 'cadvisor'
+        metrics_path: /metrics/cadvisor
+        scheme: https
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        kubernetes_sd_configs:
+          - role: node
+      - job_name: 'users-app'
+        metrics_path: /actuator/prometheus
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          # Фильтруем только поды из нужного namespace
+          - source_labels: [__meta_kubernetes_namespace]
+            action: keep
+            regex: default
+
+          # Фильтруем только поды с меткой app=otus-app
+          - source_labels: [__meta_kubernetes_pod_label_app_kubernetes_io_instance]
+            action: keep
+            regex: otus-app
+
+          # Фильтруем только поды с меткой instance.type=app
+          - source_labels: [__meta_kubernetes_pod_label_instance_type]
+            action: keep
+            regex: app
+
+          # Указываем IP пода как instance
+          - source_labels: [__meta_kubernetes_pod_container_port_number]
+            action: keep
+            regex: "8080"
+
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: instance
+      - job_name: 'postgres'
+        metrics_path: /metrics
+        static_configs:
+          - targets:
+              - 'otus-app-postgresql-metrics.default.svc.cluster.local:9187'
+
+postgresql:
+  auth:
+    username: appUser
+    database: otus
+    existingSecret: otus-app-secret
+    secretKeys:
+      adminPasswordKey: postgres-password
+      userPasswordKey: password
+  service:
+    port: 5432
+  primary:
+    persistence:
+      enabled: false
+  schema: public
+  metrics:
+    enabled: true
+    containerSecurityContext:
+      enabled: false
+
+replicaCount: 2
+
+
+image:
+  repository: jimbeam777/otus-prometheus
+  pullPolicy: IfNotPresent
+  tag: "0.0.2"
+
+migration:
+  image:
+    repository: jimbeam777/otus-users-migration
+    pullPolicy: IfNotPresent
+    tag: "0.0.1"
+
+nameOverride: ""
+fullnameOverride: ""
+
+podLabels: {}
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  hosts:
+    - host: arch.homework
+      paths:
+        - path: /
+          pathType: Prefix
+
+livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+readinessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
