@@ -1,0 +1,713 @@
+{
+	"info": {
+		"_postman_id": "2d7f7d5b-898b-4889-81b6-f82f2bd44166",
+		"name": "Otus",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "1067790"
+	},
+	"item": [
+		{
+			"name": "hw-04",
+			"item": [
+				{
+					"name": "create user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"id is not null\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.id).to.not.eql(null);",
+									"    pm.collectionVariables.set(\"userId\", jsonData.id);",
+									"});",
+									"",
+									"pm.test(\"login matches the one in the request\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var loginFromRequest = pm.request.body.raw ? JSON.parse(pm.request.body.raw).login : \"\";",
+									"    pm.expect(jsonData.login).to.eql(loginFromRequest);",
+									"    pm.collectionVariables.set(\"userLogin\", jsonData.login);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"Artur\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/users",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.collectionVariables.set(\"userLogin\", JSON.parse(pm.request.body.raw).login);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"{{userLogin}}-updated\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/users/{{userId}}",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"id equals \" + pm.collectionVariables.get(\"userId\"), function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get(\"userId\"));",
+									"});",
+									"",
+									"pm.test(\"login equals \" + pm.collectionVariables.get(\"userLogin\"), function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.login).to.eql(pm.collectionVariables.get(\"userLogin\"));",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{otus-host}}/users/{{userId}}",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.collectionVariables.unset(\"userId\");",
+									"    pm.collectionVariables.unset(\"userLogin\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{otus-host}}/users/{{userId}}",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "hw-06",
+			"item": [
+				{
+					"name": "registration user 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    let currentCount = pm.collectionVariables.get(\"userCounter\") || 0;",
+									"    currentCount = parseInt(currentCount, 10);",
+									"    pm.collectionVariables.set(\"previousCounter\", currentCount);",
+									"    pm.collectionVariables.set(\"userCounter\", currentCount + 1);",
+									"}",
+									"",
+									"console.log(\"Request: \", JSON.parse(pm.request.body.raw))",
+									" console.log(\"Response Body: \", pm.response.json());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"user-{{userCounter}}\",\n    \"password\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/sign-up",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"sign-up"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unautheticated get profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{otus-host}}/profile",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "unautheticated update profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"console.log(\"Request: \", JSON.parse(pm.request.body.raw))"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nickname\": \"new nickname\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/profile",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login user 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Response status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let token = pm.response.text()",
+									"",
+									"pm.test(\"Token is present\", function () {",
+									"    pm.expect(token).to.be.a(\"string\").and.to.not.be.empty;",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"authToken\", token);",
+									"",
+									"console.log(\"Extracted Token:\", token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"user-{{previousCounter}}\",\n    \"password\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/sign-in",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"sign-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    pm.collectionVariables.set(\"nickname\", JSON.parse(pm.request.body.raw).nickname);",
+									"}",
+									"",
+									"console.log(\"Request: \", JSON.parse(pm.request.body.raw))"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nickname\": \"new-ickname-{{previousCounter}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/profile",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get new data of profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"nickname equals \" + pm.collectionVariables.get(\"nickname\"), function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.nickname).to.eql(pm.collectionVariables.get(\"nickname\"));",
+									"});",
+									"",
+									" console.log(\"Response Body: \", pm.response.json());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/profile",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "registration user 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    let currentCount = pm.collectionVariables.get(\"userCounter\") || 0;",
+									"    currentCount = parseInt(currentCount, 10);",
+									"    pm.collectionVariables.set(\"previousCounter\", currentCount);",
+									"    pm.collectionVariables.set(\"userCounter\", currentCount + 1);",
+									"}",
+									"",
+									"console.log(\"Request: \", JSON.parse(pm.request.body.raw))",
+									" console.log(\"Response Body: \", pm.response.json());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"user-{{userCounter}}\",\n    \"password\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/sign-up",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"sign-up"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login user 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Response status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let token = pm.response.text()",
+									"",
+									"pm.test(\"Token is present\", function () {",
+									"    pm.expect(token).to.be.a(\"string\").and.to.not.be.empty;",
+									"});",
+									"",
+									"pm.collectionVariables.set(\"authToken\", token);",
+									"",
+									"console.log(\"Extracted Token:\", token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"login\": \"user-{{previousCounter}}\",\n    \"password\": \"123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/sign-in",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"sign-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user 2 profile",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"nickname equals user-\" + pm.collectionVariables.get(\"previousCounter\"), function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.nickname).to.eql(\"user-\" + pm.collectionVariables.get('previousCounter'));",
+									"});",
+									"",
+									" console.log(\"Response Body: \", pm.response.json());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{otus-host}}/profile",
+							"protocol": "http",
+							"host": [
+								"{{otus-host}}"
+							],
+							"path": [
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "otus-host",
+			"value": "arch.homework",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userCounter",
+			"value": "0",
+			"type": "string"
+		},
+		{
+			"key": "nickname",
+			"value": ""
+		},
+		{
+			"key": "previousCounter",
+			"value": "0",
+			"type": "string"
+		}
+	]
+}
