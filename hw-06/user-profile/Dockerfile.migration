@@ -1,0 +1,18 @@
+FROM liquibase/liquibase:4.30
+
+ENV DATABASE_HOST=""
+ENV DATABASE_PORT=""
+ENV DATABASE_NAME=""
+ENV DATABASE_SCHEMA=""
+ENV DATABASE_USERNAME=""
+ENV DATABASE_PASSWORD=""
+
+COPY migration /liquibase/changelog
+WORKDIR /liquibase/changelog
+CMD ["sh", "-c", "docker-entrypoint.sh \
+--url=\"jdbc:postgresql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?currentSchema=${DATABASE_SCHEMA}\" \
+--username=${DATABASE_USERNAME} \
+--password=${DATABASE_PASSWORD} \
+--classpath=/liquibase/changelog \
+--logLevel=info \
+--changeLogFile=changelog-master.yaml update"]

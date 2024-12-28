@@ -1,0 +1,35 @@
+server:
+  port: ${APP_PORT:8080}
+services:
+  auth-service:
+    uri: ${AUTH_SERVICE_URI}
+  profile-service:
+    uri: ${PROFILE_SERVICE_URI}
+spring:
+  cloud:
+    gateway:
+      httpclient:
+        wiretap: true
+      httpserver:
+        wiretap: true
+      routes:
+        - id: signUp
+          uri: ${services.auth-service.uri}
+          predicates:
+            - Path=/sign-up
+            - Method=POST
+        - id: signIn
+          uri: ${services.auth-service.uri}
+          predicates:
+            - Path=/sign-in
+            - Method=POST
+        - id: getProfile
+          uri: ${services.profile-service.uri}
+          predicates:
+            - Path=/profile
+            - Method=GET
+        - id: updateProfile
+          uri: ${services.profile-service.uri}
+          predicates:
+            - Path=/profile
+            - Method=PUT

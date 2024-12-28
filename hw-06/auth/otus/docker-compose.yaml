@@ -1,0 +1,46 @@
+version: "3.6"
+
+services:
+  otus-auth-pg:
+    container_name: otus_auth_pg
+    restart: 'no'
+    image: postgres:16.3
+    environment:
+      POSTGRES_DB: otus
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5566:5432"
+    networks:
+      - otus-network
+
+  otus-auth-migration:
+    container_name: otus_auth_migartion
+    restart: 'no'
+    image: jimbeam777/otus-auth-migration:0.0.1
+    environment:
+      DATABASE_HOST: '192.168.100.8'
+      DATABASE_PORT: '5566'
+      DATABASE_NAME: 'otus'
+      DATABASE_SCHEMA: 'public'
+      DATABASE_USERNAME: 'postgres'
+      DATABASE_PASSWORD: 'postgres'
+
+  otus-auth:
+    container_name: otus_auth
+    restart: 'no'
+    image: jimbeam777/otus-auth:0.0.1
+    environment:
+      DB_HOST: 192.168.100.8
+      DB_PORT: 5566
+      DB_NAME: otus
+      DB_SCHEMA: public
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+    ports:
+      - "8000:8080"
+    networks:
+      - otus-network
+
+networks:
+  otus-network:
