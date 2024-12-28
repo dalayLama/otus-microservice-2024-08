@@ -1,0 +1,65 @@
+@startuml
+
+actor "User" as u
+boundary "Nginx Ingress Controller" as ngx
+participant "gateway" as gw
+participant "auth service" as auth
+participant "user profile service" as profile
+
+u -> ngx: POST /sign-in
+note right u
+Request body:
+{
+    "login": "user",
+    "password": "password""
+}
+end note
+
+ngx -> gw: forward request
+
+gw -> auth: forward to POST /sign-in
+auth --> gw: {token}
+
+gw --> ngx: {token}
+
+ngx --> u: {token}
+
+u -> ngx: GET /profile
+note right u
+Headers:
+    Authorization: {token}
+end note
+
+ngx -> gw: forward request
+
+gw -> profile: forward to GET /profile
+
+profile --> gw:
+note left profile
+{
+    "id": 1,
+    "login": "user",
+    "nickname": "user"
+}
+end note
+
+gw --> ngx
+note left gw
+{
+    "id": 1,
+    "login": "user",
+    "nickname": "user"
+}
+end note
+
+ngx --> u
+note left ngx
+{
+    "id": 1,
+    "login": "user",
+    "nickname": "user"
+}
+end note
+
+
+@enduml
